@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 using Windows.Globalization;
 using Windows.Media.SpeechRecognition;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
 namespace VoiceCommandsDemo {
+
+    // TODO: What can I say? => https://docs.microsoft.com/en-us/windows/uwp/design/input/speech-interactions
 
     public class VoiceCommandTrigger : Trigger {
 
         private static SpeechRecognizer _sr;
         private static readonly Dictionary<string, VoiceCommandTrigger> _triggers = new Dictionary<string, VoiceCommandTrigger>(StringComparer.InvariantCultureIgnoreCase);
+        private static bool _initialized;
 
         static VoiceCommandTrigger() {
             Task.Run(async () => {
@@ -36,7 +40,16 @@ namespace VoiceCommandsDemo {
                 await _sr.CompileConstraintsAsync();
                 _sr.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
                 await _sr.ContinuousRecognitionSession.StartAsync();
+
+                _initialized = true;
+                Debug.WriteLine("VoiceCommandTrigger Initialized");
             });
+        }
+
+        internal static void Activate(WindowActivatedEventArgs e) {
+            if (_initialized && e.WindowActivationState == CoreWindowActivationState.CodeActivated && _sr.State == SpeechRecognizerState.Idle) {
+                _ = _sr.ContinuousRecognitionSession.StartAsync();
+            }
         }
 
         public string Text {
@@ -58,6 +71,8 @@ namespace VoiceCommandsDemo {
                 }
             }
         }
+
+
 
         private static void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args) {
             Debug.WriteLine(args.Result.Text);
