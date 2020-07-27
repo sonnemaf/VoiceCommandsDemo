@@ -4,7 +4,8 @@ using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Automation.Provider;
 using Windows.UI.Xaml.Controls;
 
-namespace VoiceCommandsDemo {
+namespace VoiceCommandsDemo.Behaviors {
+
     public class ClickAction : DependencyObject, IAction {
 
         public object Execute(object sender, object parameter) {

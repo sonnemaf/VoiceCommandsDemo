@@ -117,16 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ButtonCancel.Content" xml:space="preserve">
-    <value>Cancel</value>
-    <comment> </comment>
+  <data name="ButtonAdd.Content" xml:space="preserve">
+    <value>&gt; Add &gt;</value>
   </data>
   <data name="ButtonDelete.Content" xml:space="preserve">
-    <value>Delete</value>
-    <comment> </comment>
+    <value>&lt; Delete &lt;</value>
   </data>
-  <data name="CommandCancel.Text" xml:space="preserve">
-    <value>Cancel</value>
+  <data name="CommandAddl.Text" xml:space="preserve">
+    <value>Add|at</value>
   </data>
   <data name="CommandDelete.Text" xml:space="preserve">
     <value>Delete</value>

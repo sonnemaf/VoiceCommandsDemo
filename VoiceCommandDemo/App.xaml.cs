@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using VoiceCommandsDemo.Behaviors;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;

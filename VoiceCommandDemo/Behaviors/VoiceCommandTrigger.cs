@@ -9,21 +9,21 @@ using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 
-namespace VoiceCommandsDemo {
+namespace VoiceCommandsDemo.Behaviors {
 
     // TODO: What can I say? => https://docs.microsoft.com/en-us/windows/uwp/design/input/speech-interactions
 
     public class VoiceCommandTrigger : Trigger {
 
         private static SpeechRecognizer _sr;
-        private static readonly Dictionary<string, VoiceCommandTrigger> _triggers = new Dictionary<string, VoiceCommandTrigger>(StringComparer.InvariantCultureIgnoreCase);
+        private static readonly Dictionary<string, List<VoiceCommandTrigger>> _triggers = new Dictionary<string, List<VoiceCommandTrigger>>(StringComparer.InvariantCultureIgnoreCase);
         private static bool _initialized;
 
         static VoiceCommandTrigger() {
             Task.Run(async () => {
 
                 foreach (var item in Windows.System.UserProfile.GlobalizationPreferences.Languages) {
-                    var language = new Windows.Globalization.Language(item);
+                    var language = new Language(item);
                     try {
                         _sr = new SpeechRecognizer(language);
                         break;
@@ -31,9 +31,7 @@ namespace VoiceCommandsDemo {
                         Debug.WriteLine(ex);
                     }
                 }
-                if (_sr is null) {
-                    _sr = new SpeechRecognizer();
-                }
+                if (_sr is null) _sr = new SpeechRecognizer();
                 Debug.WriteLine($"SpeechRecognizer Language: { _sr.CurrentLanguage.DisplayName}");
 
                 _sr.ContinuousRecognitionSession.AutoStopSilenceTimeout = TimeSpan.MaxValue;
@@ -47,9 +45,7 @@ namespace VoiceCommandsDemo {
         }
 
         internal static void Activate(WindowActivatedEventArgs e) {
-            if (_initialized && e.WindowActivationState == CoreWindowActivationState.CodeActivated && _sr.State == SpeechRecognizerState.Idle) {
-                _ = _sr.ContinuousRecognitionSession.StartAsync();
-            }
+            if (_initialized && e.WindowActivationState == CoreWindowActivationState.CodeActivated && _sr.State == SpeechRecognizerState.Idle) _ = _sr.ContinuousRecognitionSession.StartAsync();
         }
 
         public string Text {
@@ -63,12 +59,8 @@ namespace VoiceCommandsDemo {
             if (d is VoiceCommandTrigger source) {
                 var newValue = (string)e.NewValue;
                 var oldValue = (string)e.OldValue;
-                if (!string.IsNullOrEmpty(oldValue)) {
-                    _triggers.Remove(oldValue);
-                }
-                if (!string.IsNullOrEmpty(newValue)) {
-                    _triggers[newValue] = source;
-                }
+                if (!string.IsNullOrEmpty(oldValue)) source.Remove(oldValue);
+                if (!string.IsNullOrEmpty(newValue)) source.Add(newValue);
             }
         }
 
@@ -76,21 +68,38 @@ namespace VoiceCommandsDemo {
 
         private static void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args) {
             Debug.WriteLine(args.Result.Text);
-            if (_triggers.TryGetValue(args.Result.Text, out var trigger)) {
-                _ = trigger.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
-                    Interaction.ExecuteActions(trigger.AssociatedObject, trigger.Actions, args);
-                });
+            if (_triggers.TryGetValue(args.Result.Text, out var list)) {
+                foreach (var trigger in list) {
+                    _ = trigger.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                        Interaction.ExecuteActions(trigger.AssociatedObject, trigger.Actions, args);
+                    });
+                }
             }
         }
 
-        protected override void OnAttached() {
-            base.OnAttached();
-            _triggers[this.Text] = this;
+        protected override void OnDetaching() {
+            Remove(Text);
         }
 
-        protected override void OnDetaching() {
-            if (_triggers[this.Text] == this) {
-                _triggers.Remove(this.Text);
+        private void Add(string text) {
+            foreach (var item in text.Split('|')) {
+                if (_triggers.TryGetValue(item, out var list)) {
+                    list.Add(this);
+                } else {
+                    list = new List<VoiceCommandTrigger>() {
+                        this
+                    };
+                    _triggers[item] = list;
+                }
+            }
+        }
+
+        private void Remove(string text) {
+            foreach (var item in text.Split('|')) {
+                if (_triggers.TryGetValue(item, out var list)) {
+                    list.Remove(this);
+                    if (list.Count == 0) _triggers.Remove(item);
+                }
             }
         }
     }
