@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -40,6 +41,10 @@ namespace VoiceCommandsDemo {
                 listBoxSelected.SelectedIndex = listBoxSelected.Items.Count - 1;
                 textBoxExtraItem.Text = string.Empty;
             }
+        }
+
+        public void WhatCanISay() {
+            _ = new MessageDialog("TODO: What can I Say").ShowAsync();
         }
     }
 }

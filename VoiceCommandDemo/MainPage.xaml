@@ -13,6 +13,14 @@
     <Grid Padding="12"
           ColumnSpacing="12"
           RowSpacing="12">
+
+        <Interactivity:Interaction.Behaviors>
+            <Behaviors:VoiceCommandTrigger Text="What can I say">
+                <Custom1:CallMethodAction MethodName="WhatCanISay"
+                                          TargetObject="{x:Bind pageRoot}" />
+            </Behaviors:VoiceCommandTrigger>
+        </Interactivity:Interaction.Behaviors>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="120" />
