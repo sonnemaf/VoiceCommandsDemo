@@ -26,7 +26,7 @@ namespace VoiceCommandsDemo {
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e) {
+        protected async override void OnLaunched(LaunchActivatedEventArgs e) {
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -54,12 +54,11 @@ namespace VoiceCommandsDemo {
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
-                Window.Current.Activated += Current_Activated;
-            }
-        }
 
-        private void Current_Activated(object sender, Windows.UI.Core.WindowActivatedEventArgs e) {
-            VoiceCommandTrigger.Activate(e);
+                if (VoiceCommandTrigger.SpeechRecognizer is null) {
+                    VoiceCommandTrigger.SpeechRecognizer = await WindowsMediaSpeechRecognizer.CreateAsync(Window.Current);
+                }
+            }
         }
 
         /// <summary>

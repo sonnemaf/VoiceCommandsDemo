@@ -119,8 +119,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Behaviors\ISpeechRecognitionResult.cs" />
+    <Compile Include="Behaviors\ISpeechRecognizer.cs" />
+    <Compile Include="Behaviors\RecognizedEventArgs.cs" />
     <Compile Include="Behaviors\SelectListBoxItemAction.cs" />
     <Compile Include="Behaviors\ClickAction.cs" />
+    <Compile Include="Behaviors\SpeechRecognitionResult.cs" />
+    <Compile Include="Behaviors\WindowsMediaSpeechRecognizer.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
